@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>CNC MACHINE WINDOW</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f2f2f2;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);// change no. of columns
+            gap: 20px; /* Spacing between forms */
+            margin: 20px 0;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-heading {
+            font-size: 50px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #007BFF;
+            text-align: center; /* Center align heading */
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: normal;
+        }
+
+        select, input {
+            width: calc(100% - 12px);
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #007BFF; /* Blue */
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%; /* Full-width button */
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .navigation-button {
+            background-color: #007BFF; /* Blue */
+            margin-top: 20px; /* Space above the button */
+        }
+
+        .navigation-button:hover {
+            background-color: #0056b3; /* Darker blue */
+        }
+    </style>
+</head>
+<body>
+    <h1>CNC MACHINE WINDOW</h1>
+    <div class="form-grid">
+        {% for i in range(num_frames) %}
+        <form id="form{{ i + 1 }}" method="POST" action="/submit">
+            <div class="form-container">
+                <div class="form-heading">CNC {{ i + 1 }}</div> <!-- Centered form heading -->
+                <label for="employee{{ i }}">Select Employee:</label>
+                <select id="employee{{ i }}" name="employee{{ i }}">
+                    <option value="Rahul">Rahul</option>
+                    <option value="Rohit">Rohit</option>
+                    <option value="Shiva">Shiva</option>
+                </select>
+
+                <label for="component{{ i }}">Select Component:</label>
+                <select id="component{{ i }}" name="component{{ i }}">
+                    <option value="CSC">CSC</option>
+                    <option value="Flange">Flange</option>
+                    <option value="Mini Cylinder">Mini Cylinder</option>
+                </select>
+
+                <label for="process{{ i }}">Select Process:</label>
+                <select id="process{{ i }}" name="process{{ i }}" onchange="addFields({{ i }})">
+                    <option value="">-- Select Process --</option>
+                    <option value="Drilling">Drilling</option>
+                    <option value="Facing">Facing</option>
+                    <option value="Leak">Leak</option>
+                    <option value="Packaging">Packaging</option>
+                </select>
+
+                <div id="additional-fields{{ i }}"></div>
+
+                <button type="submit">Submit CNC {{ i + 1 }}</button>
+            </div>
+        </form>
+        {% endfor %}
+    </div>
+
+    <button class="navigation-button" onclick="window.location.href='/spm'">Go to SPM Machine Window</button>
+
+    <script>
+    // Prevent Enter key from submitting the form and move to the next input field
+    document.addEventListener('DOMContentLoaded', function() {
+        const forms = document.querySelectorAll('form');
+
+        forms.forEach((form) => {
+            const inputs = form.querySelectorAll('input, select'); // Select all input and select elements
+
+            inputs.forEach((input, index) => {
+                input.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') {
+                        event.preventDefault(); // Prevent the form from submitting
+
+                        // Focus on the next input
+                        if (index + 1 < inputs.length) {
+                            inputs[index + 1].focus();
+                        }
+                    }
+                });
+            });
+        });
+    });
+</script>
+
+
+    <script>
+        function addFields(formIndex) {
+            const additionalFieldsDiv = document.getElementById('additional-fields' + formIndex);
+            additionalFieldsDiv.innerHTML = ''; // Clear previous fields
+
+            const processSelect = document.getElementById('process' + formIndex);
+            const selectedProcess = processSelect.value;
+
+            if (selectedProcess === 'Drilling') {
+                additionalFieldsDiv.innerHTML = `<label for="drillingDepth${formIndex}">Drilling Depth:</label>
+                                                  <input type="text" id="drillingDepth${formIndex}" name="drillingDepth${formIndex}" placeholder="Enter depth">`;
+            } else if (selectedProcess === 'Facing') {
+                additionalFieldsDiv.innerHTML = `<label for="facingSpeed${formIndex}">Facing Speed:</label>
+                                                  <input type="text" id="facingSpeed${formIndex}" name="facingSpeed${formIndex}" placeholder="Enter speed">`;
+            } else if (selectedProcess === 'Leak') {
+                additionalFieldsDiv.innerHTML = `<label for="leakTestDuration${formIndex}">Leak Test Duration:</label>
+                                                  <input type="text" id="leakTestDuration${formIndex}" name="leakTestDuration${formIndex}" placeholder="Enter duration">`;
+            } else if (selectedProcess === 'Packaging') {
+                additionalFieldsDiv.innerHTML = `<label for="packagingType${formIndex}">Packaging Type:</label>
+                                                  <input type="text" id="packagingType${formIndex}" name="packagingType${formIndex}" placeholder="Enter packaging type">`;
+            }
+        }
+    </script>
+</body>
+</html>
